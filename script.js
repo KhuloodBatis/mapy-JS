@@ -18,18 +18,23 @@ const clearInput = function () {
       '';
 };
 
-let map, mapEvent;
+
 
 class App {
+  #map;
+  #mapEvent;
   constructor() {
     this._getPosition();
   }
 
   _getPosition() {
     if (navigator.geolocation)
-      navigator.geolocation.getCurrentPosition(this._loadMap, function () {
-        alert('Could not get your position');
-      });
+      navigator.geolocation.getCurrentPosition(
+        this._loadMap.bind(this),
+        function () {
+          alert('Could not get your position');
+        }
+      );
   }
 
   _loadMap(position) {
@@ -40,17 +45,18 @@ class App {
     console.log(`https://www.google.com/maps/@${latitude},${longitude}`);
 
     const coords = [latitude, longitude];
-    map = L.map('map').setView(coords, 13);
+
+    this.#map = L.map('map').setView(coords, 13);
     //   console.log(map);
     L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    }).addTo(map);
+    }).addTo(this.#map);
 
     //Handing click on map
-    map.on('click', function (mapE) {
+    this.#map.on('click', function (mapE) {
       //display form
-      mapEvent = mapE;
+      this.#mapEvent = mapE;
       form.classList.remove('hidden');
       inputDistance.focus();
       clearInput();
