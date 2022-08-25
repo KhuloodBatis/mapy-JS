@@ -25,6 +25,8 @@ class App {
   #mapEvent;
   constructor() {
     this._getPosition();
+    form.addEventListener('submit', this._newWorkout.bind(this));
+    inputType.addEventListener('change', this._toggleElevationField);
   }
 
   _getPosition() {
@@ -38,7 +40,6 @@ class App {
   }
 
   _loadMap(position) {
-    //   console.log(position);test
     const { latitude } = position.coords; //line y
     const { longitude } = position.coords; //line x
 
@@ -54,53 +55,46 @@ class App {
     }).addTo(this.#map);
 
     //Handing click on map
-    this.#map.on('click', function (mapE) {
-      //display form
-      this.#mapEvent = mapE;
-      form.classList.remove('hidden');
-      inputDistance.focus();
-      clearInput();
-    });
+    this.#map.on('click', this._showForm.bind(this));
   }
 
-  _showForm() {}
+  _showForm(mapE) {
+    //display form
+    this.#mapEvent = mapE;
+    form.classList.remove('hidden');
+    inputDistance.focus();
+    clearInput();
+  }
 
-  _toggleElevationField() {}
+  _toggleElevationField() {
+    inputElevation.closest('.form__row').classList.toggle('form__row--hidden');
+    inputCadence.closest('.form__row').classList.toggle('form__row--hidden');
+  }
 
-  _newWorkout() {}
+  _newWorkout(e) {
+    e.preventDefault();
+    //clear input field
+    clearInput();
+    //dispaly marker
+    const { lat, lng } = this.#mapEvent.latlng;
+
+    L.marker([lat, lng])
+      .addTo(this.#map)
+      .bindPopup(
+        L.popup({
+          maxWidth: 250,
+          minWidth: 250,
+          autoClose: false,
+          closeOnClick: false,
+          className: 'running-popup',
+        })
+      )
+      .setPopupContent('Workout')
+      .openPopup();
+  }
 }
 
 const app = new App();
 app._getPosition();
+console.log(this);
 
-//! submit form
-
-form.addEventListener('submit', function (e) {
-  e.preventDefault();
-  //clear input field
-  clearInput();
-  //dispaly marker
-  // console.log(mapEvent);
-  const { lat, lng } = mapEvent.latlng;
-
-  L.marker([lat, lng])
-    .addTo(map)
-    .bindPopup(
-      L.popup({
-        maxWidth: 250,
-        minWidth: 250,
-        autoClose: false,
-        closeOnClick: false,
-        className: 'running-popup',
-      })
-    )
-    .setPopupContent('Workout')
-    .openPopup();
-});
-
-//!change input
-
-inputType.addEventListener('change', function () {
-  inputElevation.closest('.form__row').classList.toggle('form__row--hidden');
-  inputCadence.closest('.form__row').classList.toggle('form__row--hidden');
-});
