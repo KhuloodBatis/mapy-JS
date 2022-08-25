@@ -18,8 +18,51 @@ const clearInput = function () {
       '';
 };
 
+class WorkOut {
+  date = new Date();
+  id = (Date.now() + '').slice(-10);
+  constructor(coords, distance, duration) {
+    //  this.date = ...
+    // this.id =...
+    this.coords = coords;//[lat,lng]
+    this.distance = distance; //in km
+    this.duration = duration; // in min
+  }
+}
 
+//!Running
+class Running extends WorkOut {
+  constructor(coords, distance, duration, cadence) {
+    super(coords, distance, duration);
+    this.cadence = cadence;
+    this.calcPace();
+  }
+  calcPace() {
+    //min/km
+    this.pace = this.duration / this.distance;
+    return this.pace;
+  }
+}
 
+//!cycling
+class Cycling extends WorkOut {
+  constructor(coords, distance, duration, elevationGain) {
+    super(coords, distance, duration);
+    this.elevationGain = elevationGain;
+    this.calcSpeed();
+  }
+  calcSpeed() {
+    //km/h
+    this.speed = this.distance / (this.duration / 60);
+    return this.speed;
+  }
+}
+
+// const run1 = new Running([39,-12], 5.2 ,24 ,178);
+// const cyc1 = new Cycling([39,-12], 5.2 ,24 ,178);
+// console.log(run1,cyc1);
+//////////////////////////////////////////////////////////////
+///!APPLICATION ARCHITECTRUE
 class App {
   #map;
   #mapEvent;
